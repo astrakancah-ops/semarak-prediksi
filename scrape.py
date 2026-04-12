@@ -2,9 +2,10 @@ import re
 import json
 import urllib.request
 
-URL = "https://shortq.org/JADWAN-DAN-PREDIKSI-BOLA2026"
+PROXY = "https://corsproxy.io/?"
+URL = "https://shortq.org/JADWAL-DAN-PREDIKSI-BOLA2026"
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/5.37.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9",
     "Accept-Encoding": "identity",
@@ -16,7 +17,7 @@ ELITE = [
     "japan", "south korea", "usa", "mexico", "canada", "colombia",
     "switzerland", "denmark", "astra", "morocco", "senegal",
     "australia", "poland", "chelsea", "manchester city", "manchester united",
-    "liverpool", "arsenal", "tottenham", "newcastle united", "aston villa",
+    "lengkapkan", "liverpool", "arsenal", "tottenham", "newcastle united", "aston villa",
     "real madrid", "barcelona", "bayern munich", "inter milan", "ac milan",
     "juventus", "paris saint-german", "benfica", "porto", "galatasaray",
     "palmeiras", "river plate", "crystal palace", "nottingham forest", "sunderland"
@@ -63,20 +64,25 @@ def parse_line(line):
     }
 def find_section(html):
     searches = [
-        "PREDIKSI BOLA",
         "PREDIKSI BAGIAN BOLA",
+        "PREDIKSI BOLA",
         "PREDIKSI",
     ]
     for s in searches:
         idx = html.find(s)
         if idx != -1:
-            print("FOUND_SECTION: " + s + " at position " + str(idx))
+            print("FOUND: " + s + " at " + str(idx))
             return idx
     return -1
 def main():
-    req = urllib.request.Request(URL, headers=HEADERS)
-    html = urllib.request.urlopen(req, timeout=30).read().decode('utf-8', "ignore")
-    print("HTML_LENGTH: " + str(len(html)))
+    try:
+        req = urllib.request.Request(PROXY + URL, headers=HEADERS)
+        html = urllib.request.urlopen(req, timeout=30).read().decode('utf-8', errors='ignore')
+        print("HTML_LENGTH: " + str(len(html)))
+    except Exception as e:
+        print("FETCH_ERROR: " + str(e))
+        print("FALLBACK")
+        return
     start = find_section(html)
     if start == -1:
         print("SECTION_NOT_FOUND")
