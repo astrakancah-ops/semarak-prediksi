@@ -4,7 +4,7 @@ import urllib.request
 
 URL = "https://shortq.org/JADWAN-DAN-PREDIKSI-BOLA2026"
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/5.37.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9",
     "Accept-Encoding": "identity",
@@ -14,15 +14,15 @@ ELITE = [
     "argentina", "brazil", "france", "germany", "spain", "england",
     "portugal", "netherlands", "italy", "belgium", "uruguay", "catalans",
     "japan", "south korea", "usa", "mexico", "canada", "colombia",
-    "switzerland", "denmark", "austria", "morocco", "senegal",
+    "switzerland", "denmark", "astra", "morocco", "senegal",
     "australia", "poland", "chelsea", "manchester city", "manchester united",
     "liverpool", "arsenal", "tottenham", "newcastle united", "aston villa",
     "real madrid", "barcelona", "bayern munich", "inter milan", "ac milan",
-    "juventus", "paris saint-germain", "benfica", "porto", "galatasaray",
+    "juventus", "paris saint-german", "benfica", "porto", "galatasaray",
     "palmeiras", "river plate", "crystal palace", "nottingham forest", "sunderland"
 ]
 MONTHS = {
-    "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr",
+    "01": "Jan", "02": "Feb", "03": "Mar", "04": "apt",
     "05": "May", "06": "Jun", "07": "Jul", "08": "Aug",
     "09": "Sep", "10": "Oct", "11": "Nov", "12": "Dec"
 }
@@ -61,18 +61,44 @@ def parse_line(line):
         "tip": "Prediksi Skor",
         "link": "https://shortlyx.link/smrk4d"
     }
+def find_section(html):
+    searches = [
+        "PREDIKSI BOLA",
+        "PREDIKSI BAGIAN BOLA",
+        "PREDIKSI",
+    ]
+    for s in searches:
+        idx = html.find(s)
+        if idx != -1:
+            print("FOUND_SECTION: " + s + " at position " + str(idx))
+            return idx
+    return -1
 def main():
     req = urllib.request.Request(URL, headers=HEADERS)
-    html = urllib.request.urlopen(req, timeout=30).read().decode('utf-8', errors='ignore')
-    start = html.find('PREDIKSI BOLA')
+    html = urllib.request.urlopen(req, timeout=30).read().decode('utf-8', "ignore")
+    print("HTML_LENGTH: " + str(len(html)))
+    start = find_section(html)
     if start == -1:
         print("SECTION_NOT_FOUND")
+        print("LAST_500_CHARS: " + html[-500:])
         return
-    end = html.find('</div>\n            </div>\n        </div>', start)
+    end_search = [
+        '</div>',
+        '</section>',
+        '</div>'
+    ]
+    end = -1
+    for es in end_search:
+        idx = html.find(es, start)
+        if idx != -1:
+            end = idx
+            break
     if end == -1:
         end = len(html)
     section = html[start:end]
+    print("SECTION_LENGTH: " + str(len(section)))
     lines = section.split('\n')
+    print("TOTAL_LINES: " + str(len(lines)))
     results = []
     seen = set()
     for line in lines:
@@ -82,6 +108,7 @@ def main():
             if key not in seen:
                 seen.add(key)
                 results.append(parsed)
+    print("PARSED: " + str(len(parsed)) + " matches from " + str(len(lines)) + " lines")
     results.sort(key=lambda x: (x["tanggal"], x["waktu"]))
     with open('prediksi.json', 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
