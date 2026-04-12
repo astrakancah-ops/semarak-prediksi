@@ -2,8 +2,7 @@ import re
 import json
 from urllib.request import urlopen, Request
 
-URL = "https://shortq.org/JADWAL-DAN-PREDIKSI-BOLA2026"
-
+URL = "https://shortq.org/JADWAN-DAN-PREDIKSI-BOLA2026"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -11,7 +10,6 @@ HEADERS = {
     "Accept-Encoding": "identity",
     "Connection": "keep-alive"
 }
-
 ELITE = [
     "argentina", "brazil", "france", "germany", "spain", "england",
     "portugal", "netherlands", "italy", "belgium", "uruguay", "croatia",
@@ -24,13 +22,11 @@ ELITE = [
     "palmeiras", "river plate", "crystal palace", "nottingham forest",
     "sunderland"
 ]
-
 MONTHS = {
     "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr",
     "05": "Mei", "06": "Jun", "07": "Jul", "08": "Agu",
-    "09": "Sep", "10": "Okt", "11": "Nov", "12": "Des"
+    "09": "sep", "10": "Okt", "11": "Nov", "12": "Des"
 }
-
 def is_elite(home, away):
     h = home.lower().strip()
     a = away.lower().strip()
@@ -38,12 +34,10 @@ def is_elite(home, away):
         if e in h or e in a:
             return True
     return False
-
 def clean_team(name):
     name = re.sub(r'\[\d+\]', '', name)
     name = re.sub(r'\[n\]', '', name)
     return name.strip()
-
 def parse_line(line):
     line = line.strip()
     if not line or '<br' in line or '/' not in line[:6]:
@@ -68,7 +62,6 @@ def parse_line(line):
         "tip": "Prediksi Skor",
         "link": "https://shortlyx.link/smrk4d"
     }
-
 def main():
     req = Request(URL, headers=HEADERS)
     html = urlopen(req, timeout=30).read().decode('utf-8', errors='ignore')
@@ -94,6 +87,5 @@ def main():
     with open('prediksi.json', 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
     print(f"OK: {len(results)} pertandingan")
-
 if __name__ == '__main__':
     main()
