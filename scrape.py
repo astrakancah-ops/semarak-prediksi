@@ -1,8 +1,8 @@
 import re
 import json
-from urllib.request import urlopen, Request
+from urllib.request import ulopen, Request
 
-URL = "https://shortq.org/JADWAN-DAN-PREDIKSI-BOLA2026"
+URL = "https://shortq.org/JADWAL-DAN-PREDIKSI-BOLA2026"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -23,9 +23,9 @@ ELITE = [
     "sunderland"
 ]
 MONTHS = {
-    "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr",
+    "01": "Jan", "02": "Feb", "03": "Mar", "04": "apt",
     "05": "Mei", "06": "Jun", "07": "Jul", "08": "Agu",
-    "09": "sep", "10": "Okt", "11": "Nov", "12": "Des"
+    "09": "Sep", "10": "Okt", "11": "Nov", "12": "Des"
 }
 def is_elite(home, away):
     h = home.lower().strip()
@@ -51,14 +51,14 @@ def parse_line(line):
     away = clean_team(away_raw)
     if not is_elite(home, away):
         return None
-    tanggal = f"{day} {MONTHS.get(month, month)} 2026"
-    waktu = f"{hour}:{minute}"
+    tanggal = day + " " + MONTHS.get(month, month) + " 2026"
+    waktu = hour + ":" + minute
     return {
         "tanggal": tanggal,
         "waktu": waktu,
         "home": home,
         "away": away,
-        "prediksi": f"{home} {score} {away}",
+        "prediksi": home + " " + score + " " + away,
         "tip": "Prediksi Skor",
         "link": "https://shortlyx.link/smrk4d"
     }
@@ -79,13 +79,13 @@ def main():
     for line in lines:
         parsed = parse_line(line)
         if parsed:
-            key = f"{parsed['home']}|{parsed['away']}|{parsed['waktu']}"
+            key = parsed["home"] + "|" + parsed["away"] + "|" + parsed["waktu"]
             if key not in seen:
                 seen.add(key)
                 results.append(parsed)
-    results.sort(key=lambda x: (x['tanggal'], x['waktu']))
+    results.sort(key=lambda x: (x["tanggal"], x["waktu"]))
     with open('prediksi.json', 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
-    print(f"OK: {len(results)} pertandingan")
+    print("OK: " + str(len(results)) + " pertandingan")
 if __name__ == '__main__':
     main()
