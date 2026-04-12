@@ -1,8 +1,16 @@
 import re
 import json
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 
 URL = "https://shortq.org/JADWAL-DAN-PREDIKSI-BOLA2026"
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "identity",
+    "Connection": "keep-alive"
+}
 
 ELITE = [
     "argentina", "brazil", "france", "germany", "spain", "england",
@@ -62,7 +70,8 @@ def parse_line(line):
     }
 
 def main():
-    html = urlopen(URL, timeout=30).read().decode('utf-8', errors='ignore')
+    req = Request(URL, headers=HEADERS)
+    html = urlopen(req, timeout=30).read().decode('utf-8', errors='ignore')
     start = html.find('PREDIKSI BOLA')
     if start == -1:
         print("SECTION_NOT_FOUND")
