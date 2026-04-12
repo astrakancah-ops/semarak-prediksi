@@ -2,8 +2,10 @@ import re
 import json
 import urllib.request
 
-PROXY = "https://corsproxy.io/?"
-URL = "https://shortq.org/JADWAL-DAN-PREDIKSI-BOLA2026"
+PROXIES = [
+    "https://api.allorigins.win/raw?url=",
+    "https://corsproxy.io/?url=",
+]
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -75,13 +77,20 @@ def find_section(html):
             return idx
     return -1
 def main():
-    try:
-        req = urllib.request.Request(PROXY + URL, headers=HEADERS)
-        html = urllib.request.urlopen(req, timeout=30).read().decode('utf-8', errors='ignore')
-        print("HTML_LENGTH: " + str(len(html)))
-    except Exception as e:
-        print("FETCH_ERROR: " + str(e))
-        print("FALLBACK")
+    html = None
+    for proxy in PROXIES:
+        try:
+            proxy_url = proxy + URL
+            req = urllib.request.Request(proxy_url, headers=HTML_HEADERS)
+            html = urllib.request.urlopen(req, timeout=30).read().decode('utf-8', errors='ignore')
+            print("PROXY_USED: " + proxy.split("/")[2])
+            print("HTML_LENGTH: " + str(len(html)))
+            break
+        except Exception as e:
+            print("PROXY_FAILED: " + proxy.split("/")[2] + " - " + str(e))
+            continue
+    if not html:
+        print("ALL_PROXIES_FAILED")
         return
     start = find_section(html)
     if start == -1:
