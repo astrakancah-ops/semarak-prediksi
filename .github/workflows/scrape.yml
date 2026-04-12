@@ -9,22 +9,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GH_TOKEN }}
-          persist-credentials: true
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python scrape.py
-      - name: Commit and push
+      - name: Scrape and update file
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          git config user.name "scrape-bot"
-          git config user.email "bot@github.com"
-          git add prediksi.json
-          git diff --cached --quiet
-          if git diff --cached --staged --quiet; then
-            echo "NO_CHANGES"
-          else
-            git commit -m "auto: update prediksi $(date +%Y-%m-%d\ %H:%M)"
-            git push origin main
+          python scrape.py
+          CONTENT=$(base64 -w0 prediksi.json)
+          SHA=$(curl -s -H "Authorization: token $GH_TOKEN" "https://api.github.com/repos/astrakancah-ops/semarak-prediksi/contents/prediksi.json" | python3 -c "import sys,json; print(json.load(sys.stdin)['sha'])")
+          if [ -z "$SHA" ]; then
+            echo "ERROR: Could not get SHA"
+            exit 1
           fi
+          RESULT=$(curl -s -X PUT \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/astrakanh-ops/semarak-prediksi/contents/prediksi.json" \
+            -d "{\"message\":\"auto: update prediksi $(date +%Y-%m-%d %H:%M)\",\"content\":\"$CONTENT\",\"sha\":\"$SHA\"}" \
+            | python3 -c "
+          import sys, json
+          r = json.load(sys.stdin)
+          if 'content' in r:
+              print('OK: File updated via API')
+          else:
+              print('ERROR:', r.get('message', 'Unknown error'))
+              exit 1
+          ")
