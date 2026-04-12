@@ -1,8 +1,8 @@
 import re
 import json
-from urllib.request import ulopen, Request
+import urllib.request
 
-URL = "https://shortq.org/JADWAL-DAN-PREDIKSI-BOLA2026"
+URL = "https://shortq.org/JADWAN-DAN-PREDIKSI-BOLA2026"
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -12,20 +12,19 @@ HEADERS = {
 }
 ELITE = [
     "argentina", "brazil", "france", "germany", "spain", "england",
-    "portugal", "netherlands", "italy", "belgium", "uruguay", "croatia",
+    "portugal", "netherlands", "italy", "belgium", "uruguay", "catalans",
     "japan", "south korea", "usa", "mexico", "canada", "colombia",
     "switzerland", "denmark", "austria", "morocco", "senegal",
     "australia", "poland", "chelsea", "manchester city", "manchester united",
     "liverpool", "arsenal", "tottenham", "newcastle united", "aston villa",
     "real madrid", "barcelona", "bayern munich", "inter milan", "ac milan",
     "juventus", "paris saint-germain", "benfica", "porto", "galatasaray",
-    "palmeiras", "river plate", "crystal palace", "nottingham forest",
-    "sunderland"
+    "palmeiras", "river plate", "crystal palace", "nottingham forest", "sunderland"
 ]
 MONTHS = {
-    "01": "Jan", "02": "Feb", "03": "Mar", "04": "apt",
-    "05": "Mei", "06": "Jun", "07": "Jul", "08": "Agu",
-    "09": "Sep", "10": "Okt", "11": "Nov", "12": "Des"
+    "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr",
+    "05": "May", "06": "Jun", "07": "Jul", "08": "Aug",
+    "09": "Sep", "10": "Oct", "11": "Nov", "12": "Dec"
 }
 def is_elite(home, away):
     h = home.lower().strip()
@@ -63,8 +62,8 @@ def parse_line(line):
         "link": "https://shortlyx.link/smrk4d"
     }
 def main():
-    req = Request(URL, headers=HEADERS)
-    html = urlopen(req, timeout=30).read().decode('utf-8', errors='ignore')
+    req = urllib.request.Request(URL, headers=HEADERS)
+    html = urllib.request.urlopen(req, timeout=30).read().decode('utf-8', errors='ignore')
     start = html.find('PREDIKSI BOLA')
     if start == -1:
         print("SECTION_NOT_FOUND")
